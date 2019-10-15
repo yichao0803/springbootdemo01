@@ -1,26 +1,28 @@
 package com.bjgoodwill.springbootdemo01.service.impl;
 
-import com.bjgoodwill.springbootdemo01.mapper.TravelRecordMapper;
 import com.bjgoodwill.springbootdemo01.model.TravelRecord;
+import com.bjgoodwill.springbootdemo01.model.TravelRecordRowMapper;
 import com.bjgoodwill.springbootdemo01.service.TravelRecordService;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * 调用TravelRecordMapper通过MyBatis实现管理 TravelRecordImpl
+ * TravelRecordJdbcTemplateImpl
  *
  * @author by Zhangyichao
- * @see # TravelRecordImpl
+ * @see # TravelRecordJdbcTemplateImpl
  */
-@Service("TravelRecordImpl")
-public class TravelRecordImpl implements TravelRecordService {
+@Service("TravelRecordJdbcTemplateImpl")
+public class TravelRecordJdbcTemplateImpl implements TravelRecordService {
+
 
     @Autowired
-    private TravelRecordMapper travelRecordMapper;
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 根据主键 ID 获取一条记录
@@ -30,20 +32,19 @@ public class TravelRecordImpl implements TravelRecordService {
      */
     @Override
     public TravelRecord getId(Integer id) {
-        return travelRecordMapper.getId(id);
+        String sql = String.format("select id,user_Id,traveldate,fee,days " +
+                "from travelrecord where id=?", id);
+        List<TravelRecord> list = jdbcTemplate.query(sql, new TravelRecordRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        } else return null;
     }
 
-    /**
-     * 分页获取记录
-     *
-     * @param pageIndex 开始页数 0 开始
-     * @param pageSize  页面大小
-     * @return
-     */
     @Override
     public Page<TravelRecord> getList(Integer pageIndex, Integer pageSize) {
-        PageHelper.offsetPage(pageIndex * pageSize, pageSize);
-        return travelRecordMapper.getList();
+        // TODO:该方法的返回，需要改造
+        getTravelrecordList();
+        return null;
     }
 
     /**
@@ -53,17 +54,18 @@ public class TravelRecordImpl implements TravelRecordService {
      */
     @Override
     public void deleteTravelRecord(int id) {
-        travelRecordMapper.deleteTravelRecord(id);
+        jdbcTemplate.update("DELETE FROM travelrecord WHERE id=?", id);
     }
 
     /**
      * 根据ID更新记录信息
      *
-     * @param travelRecord 一条记录
+     * @param travelRecord 记录
      */
     @Override
     public void update(TravelRecord travelRecord) {
-        travelRecordMapper.update(travelRecord);
+        jdbcTemplate.update("UPDATE travelrecord SET user_id=?,traveldate=?,fee=?,days=? WHERE id=?",
+                travelRecord.getUserId(), travelRecord.getTraveldate(), travelRecord.getFee(), travelRecord.getDays());
     }
 
     /**
@@ -87,7 +89,8 @@ public class TravelRecordImpl implements TravelRecordService {
      */
     @Override
     public void insert(TravelRecord travelRecord) {
-        travelRecordMapper.insert(travelRecord);
+        jdbcTemplate.update("insert  into travelrecord values(?,@@hostname,?,?,?)", travelRecord.getId(),
+                travelRecord.getTraveldate(), travelRecord.getFee(), travelRecord.getDays());
     }
 
     /**
@@ -104,4 +107,14 @@ public class TravelRecordImpl implements TravelRecordService {
         insert(new TravelRecord(id, userId, traveldate, fee, days));
     }
 
+    /**
+     * getTravelrecordList
+     *
+     * @return List<TravelRecord>
+     */
+    private List<TravelRecord> getTravelrecordList() {
+
+        TravelRecordRowMapper travelRecordRowMapper = new TravelRecordRowMapper();
+        return jdbcTemplate.query("select * from travelrecord", travelRecordRowMapper);
+    }
 }

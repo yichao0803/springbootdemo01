@@ -7,14 +7,21 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * TravelRecordMapper
+ * TravelRecordRowMapper jdbcTemplate  生成对象实例
  *
- * @Classname TravelRecordMapper
- * @Date 2019/10/14 13:49
- * @Created by Zhangyichao
+ * @author by Zhangyichao
+ * @see # TravelRecordRowMapper
  */
-public class TravelRecordMapper implements RowMapper<TravelRecord> {
+public class TravelRecordRowMapper implements RowMapper<TravelRecord> {
 
+    /**
+     * 根据jdbcTemplate的每一行数据生成一个TravelRecord实例对象
+     *
+     * @param resultSet
+     * @param i
+     * @return
+     * @throws SQLException
+     */
     @Override
     public TravelRecord mapRow(ResultSet resultSet, int i) throws SQLException {
         Integer id = resultSet.getInt("id");
