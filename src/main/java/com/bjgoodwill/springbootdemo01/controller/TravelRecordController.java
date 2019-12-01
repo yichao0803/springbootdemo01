@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 public class TravelRecordController {
 
     // @Autowired
-    @Resource(name = "TravelRecordImpl")
+    @Resource(name = "TravelRecordJdbcTemplateImpl")
     private TravelRecordService travelRecordService;
 
     /**

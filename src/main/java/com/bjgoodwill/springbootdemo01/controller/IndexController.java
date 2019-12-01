@@ -23,7 +23,7 @@ public class IndexController {
     @Autowired
     private TravelRecordMapper travelRecordMapper;
 
-    @Resource(name = "TravelRecordImpl")
+    @Resource(name = "TravelRecordJdbcTemplateImpl")
     private TravelRecordService travelRecordService;
 
     /**

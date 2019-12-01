@@ -72,4 +72,6 @@ public interface TravelRecordService {
      * @param days       天数
      */
     void insert(int id, String userId, Date travelDate, double fee, int days);
+
+
 }
